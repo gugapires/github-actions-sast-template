@@ -8,24 +8,31 @@ Modelo mínimo de GitHub Actions para executar análise estática de código com
 
 ```mermaid
 flowchart LR
-    P[Planejamento (Plan)] --> D[Desenvolvimento (Code)]
-    D --> B[Construção (Build)]
-    B --> S[Análise estática (SAST)]
-    B --> C[Análise de dependências (SCA)]
-    S --> T[Testes funcionais (Test)]
-    C --> T
-    T --> A[Aplicação em execução]
-    A --> X[Análise dinâmica (DAST)]
-    X --> R[Liberação (Release)]
-    R --> I[Implantação (Deployment)]
-    I --> O[Operação (Operate)]
-    O --> M[Monitoramento (Monitor)]
+    P["Planejamento (Plan)"] --> C["Codificação (Code)"]
+    C --> B
+
+    subgraph CI["CI | Integração contínua"]
+        B["Construção (Build)"] --> S["Análise estática (SAST)"]
+        B --> A["Análise de dependências (SCA)"]
+        S --> T["Testes automatizados"]
+        A --> T
+        T --> E["Ambiente de teste"]
+        E --> D["Análise dinâmica (DAST)"]
+    end
+
+    D --> R
+    subgraph CD["CD | Entrega e implantação contínuas"]
+        R["Liberação (Release)"] --> I["Implantação (Deployment)"]
+    end
+
+    I --> O["Operação (Operate)"]
+    O --> M["Monitoramento (Monitoring)"]
     M --> P
 ```
 
-DevSecOps integra a segurança ao longo do ciclo. O SAST, o SCA e o DAST são verificações que podem ser incorporadas em diferentes etapas. Este repositório automatiza somente o SAST. SCA e DAST aparecem no diagrama para contextualizar o processo.
+O diagrama mostra um fluxo possível de desenvolvimento com práticas de DevSecOps. As etapas e sua organização variam entre equipes. Na CI, o código é integrado, construído e verificado. O DAST pressupõe uma aplicação em execução em um ambiente de teste. Na CD, uma versão validada é liberada e implantada. Operação e monitoramento geram informações para o próximo ciclo.
 
-**Liberação (Release)** é preparar e aprovar uma versão para entrega. **Implantação (Deployment)** é disponibilizar essa versão em um ambiente. **Operação (Operate)** acompanha o software em uso, enquanto **Monitoramento (Monitor)** observa seu comportamento e fornece sinais para os próximos ajustes.
+Este repositório automatiza somente o SAST. SCA, testes, DAST, liberação, implantação, operação e monitoramento aparecem no diagrama para contextualizar o ciclo, mas não são configurados neste modelo.
 
 ## O que cada parte do workflow faz
 
@@ -39,4 +46,3 @@ DevSecOps integra a segurança ao longo do ciclo. O SAST, o SCA e o DAST são ve
 - `semgrep scan --config auto .` Analisa o código do diretório atual usando regras selecionadas automaticamente pelo Semgrep.
 
 Uma execução concluída com sucesso indica que o workflow terminou. Os achados precisam ser revisados e validados pela equipe.
-
